@@ -1,0 +1,242 @@
+<!-- templates/registration/login.html -->
+
+{% extends 'base.html' %}
+
+{% load static %}
+
+{% block title %}{{ garden.name }}{% endblock %}
+{% block content %}
+<link rel="stylesheet" type="text/css" href="{% static 'css/garden.css' %}">
+<h2>{{ garden.name }}</h2>
+<section class="mode-section">
+  <button class="mode-button enabled" id="building-button">Building Mode</button>
+  <button class="mode-button disabled" id="planting-button">Planting Mode</button>
+</section>
+<section id="build-options" class="mode-choices">
+  <button class="build-button" id="building" aria-label="Build a building">Building</button>
+  <button class="build-button" id="water" aria-label="Build a water feature">Water</button>
+  <button class="build-button" id="container" aria-label="Place a container">Container</button>
+  <button class="build-button" id="path" aria-label="Place a path">Path</button>
+</section>
+<section id="plant-options" class="mode-choices">
+  <button class="plant-button" id="place-button" aria-label="Place a plant">Place</button>
+  <button class="plant-button" id="move-button" aria-label="Move a plant">Move</button>
+  <button class="plant-button" id="remove-button" aria-label="Remove a plant">Remove</button>
+  <button class="plant-button" id="seeds-button" aria-label="View all of your seeds">Seeds</button>
+  <button class="plant-button" id="suggestions-button" aria-label="View planting suggestions">Suggestions</button>
+  <button class="plant-button" id="planner-button" aria-label="View the planner">Planner</button>
+</section>
+<div id="garden">
+{% for n in length %}
+  <div class="row">
+  {% for q in width %}
+    <span class="cell" id="{{q}}-{{n}}"></span>
+  {% endfor %}
+  </div>
+{% endfor %}
+</div>
+{% endblock %}
+{% block javascript %}
+<script>
+  //begin server cooperation
+  
+
+  //begin non AJAX-y functions
+  var building = true;
+  var planting = false;
+  var firstClick = true;
+  var clickedGrids = [];
+  var currentGridWidth = Number;
+
+  var structure = {
+    type: String,
+    xcoord: Number,
+    ycoord: Number,
+    width: Number,
+    height: Number,
+    id: Number,
+    Structure: function(type, xcoord, ycoord, width, height) {
+      //add attributes to the structure
+      let idSet = false;
+      this.type = type;
+      this.xcoord = xcoord;
+      this.ycoord = ycoord;
+      this.width = width;
+      this.height = height;
+      do{ //this will set this.id with a unique id
+        let id = Math.random() * 1000 + this.type //should generate an id like "151building"
+        //check that this id does not exist
+        if(!document.getElementById(id)){ //if you CAN'T get an element of this id
+          console.log("id has not been used. Setting current structure to this id");
+          this.id = id;
+          idSet = true;
+        } //if this resolves that the element of that id DOES exist, it will repeat the mathrandom function to make a new id
+      } while (!idSet);
+      //create a structure with the attributes of this structure,
+      const newStructure = document.createElement('span');
+
+      newStructure.id = this.id + "";
+      var cellWidth = 32;
+      newStructure.style.width = this.width * cellWidth + "px";
+      newStructure.style.height = this.height * cellWidth + "px";
+      newStructure.classList.add("structure");
+      newStructure.classList.add(this.type); //adds a CSS class that will style the structure to match it's typefield
+      newStructure.style.left = this.xcoord * cellWidth + "px";
+      newStructure.style.top = this.ycoord * cellWidth + "px";
+      console.log(newStructure.style.width + " " + newStructure.style.height);
+      let garden = document.getElementById("garden");
+
+      garden.appendChild(newStructure);
+      console.log(newStructure.style.position);
+      console.log("structure appended");
+      //place it on the dom at the correct x and y coords (provided by style left and top)
+    }
+  };
+
+  function modeToggle(){
+    if(building){ //if building mode is enabled
+      planting = true;
+      building = false;
+      plantbutton.classList.add("enabled"); //trigger a change in the CSS by changing the classes around
+      plantbutton.classList.remove("disabled");
+      buildbutton.classList.add("disabled");
+      buildbutton.classList.remove("enabled");
+      plantoptions.style.display = "flex";
+      buildoptions.style.display = "none";
+    } else { //if planting mode is enabled
+      planting = false;
+      building = true;
+      plantbutton.classList.add("disabled"); //trigger a change in the CSS by changing the classes around
+      plantbutton.classList.remove("enabled");
+      buildbutton.classList.add("enabled");
+      buildbutton.classList.remove("disabled");
+      plantoptions.style.display = "none";
+      buildoptions.style.display = "flex";
+    }
+  }
+
+  function gardenClick(e){
+    let gridClicked = e.target;  //get the grid we clicked on
+    if(firstClick){
+      if(clickedGrids.length > 0){
+        for(i = 0; i < clickedGrids.length; i++){
+          if(clickedGrids[i].classList.contains("cell")){ //make sure you had been clicking a grid cell
+            clickedGrids[i].style.backgroundColor = "#a37d64"; //reset the grids if we initiate another first click
+          }
+        }
+        clickedGrids.splice(0, clickedGrids.length);
+      }
+      if(gridClicked.classList.contains("cell")){
+        clickedGrids.push(gridClicked); //check is we clicked a cell
+        gridClicked.style.backgroundColor = "green";
+        let topLeftCoordinates = gridClicked.id.split('-');
+        console.log(topLeftCoordinates);
+        firstClick = false;
+      }
+    } else { //if the second click
+      if(gridClicked.classList.contains("cell")){ //check is we clicked a cell
+        clickedGrids.push(gridClicked);
+        gridClicked.style.backgroundColor = "green";
+        let bottomRightCoordinates = gridClicked.id.split('-');
+        console.log(bottomRightCoordinates);
+        firstClick = true; //next click should technically be a first click
+      }
+    }
+  }
+
+  function confirmPlace(e){
+    let buttonPressed = e.target;
+    let garden = document.getElementById('garden');
+    buttonPressed.textContent = e.target.id;
+    garden.removeEventListener("click", gardenClick); //when done being true, remove event listener on garden
+    garden.style.backgroundColor = "transparent";
+    buttonPressed.removeEventListener("click", confirmPlace);
+    buttonPressed.addEventListener("click", startPlaceStructure);
+    if(clickedGrids.length == 2){
+      //get the grid arrays again
+      let gridArray = [];
+      console.log("the old array was: " + gridArray);
+      gridArray[0] = clickedGrids[0].id.split('-');
+      gridArray[1] = clickedGrids[1].id.split('-'); //now gridArray holds coordinate pairs,
+      let newArray = []; //create a new array of arrays to hold proper top left to bottom right coordinate system
+      newArray[0] = [];
+      newArray[1] = [];
+      if(gridArray[0][0] <= gridArray[1][0]){ // so we need to find the left most(lowest) x value
+        newArray[0][0] = gridArray[0][0];
+        newArray[1][0] = gridArray[1][0];
+      } else {
+        newArray[0][0] = gridArray[1][0];
+        newArray[1][0] = gridArray[0][0];
+      }
+      if(gridArray[0][1] <= gridArray[1][1]){ // so we need to find the top most(lowest) y value
+        newArray[0][1] = gridArray[0][1];
+        newArray[1][1] = gridArray[1][1];
+      } else {
+        newArray[0][1] = gridArray[1][1];
+        newArray[1][1] = gridArray[0][1];
+      }
+      console.log("the new array is: " + newArray);
+      for(i = 0; i < clickedGrids.length; i++){
+        if(clickedGrids[i].classList.contains("cell")){ //make sure you had been clicking a grid cell
+          clickedGrids[i].style.backgroundColor = "#a37d64"; //reset the grids if we initiate another first click
+        }
+      }
+      clickedGrids.splice(0, clickedGrids.length);
+      //we need to first find the top left corner and bottom right
+      let width = newArray[1][0] - newArray[0][0] + 1;
+      let height = newArray[1][1] - newArray[0][1] + 1;
+      console.log(width + " by " + height);
+      let left = newArray[0][0];
+      let top = newArray[0][1];
+      let type = e.target.id;
+      structure.Structure(type, left, top, width, height);
+      newArray.splice(0, newArray.length)
+      //then we need to calculate how many grid squares it is high and wide
+      //then we need to convert that width and height into relevant pixels
+      //and send our parameters to the structure constructor
+    } else if(clickedGrids.length == 1){
+      return;
+      //generate a single square meter structure
+    } else {
+      return;
+    }
+  }
+
+  function startPlaceStructure(e){
+    //first, change the button text to say"finish placing"
+    let buttonPressed = e.target;
+    buttonPressed.textContent = "confirm place";
+    //make the garden clickable
+    let garden = document.getElementById('garden');
+
+    buttonPressed.removeEventListener("click", startPlaceStructure); //change what pressing the renamed button does
+    buttonPressed.addEventListener("click", confirmPlace);
+    garden.addEventListener("click", gardenClick);
+    garden.style.backgroundColor = "yellow"; //to show that the garden is active!
+    //you'll want to then move on to a new function trigger by a click within the garden
+  }
+
+  var plantbutton = document.getElementById("planting-button");
+  var buildbutton = document.getElementById("building-button");
+
+  var plantoptions = document.getElementById("plant-options");
+  var buildoptions = document.getElementById("build-options");
+  plantbutton.addEventListener("click", modeToggle);
+  buildbutton.addEventListener("click", modeToggle);
+
+  var building = document.getElementById("building"); //get the building button
+  building.type = "building";
+  var water = document.getElementById("water"); //get the water button
+  water.type = "water";
+  var path = document.getElementById("path"); //get the path button
+  path.type = "path";
+  var container = document.getElementById("container"); //get the container button
+  container.type = "container";
+  building.addEventListener("click", startPlaceStructure);
+  water.addEventListener("click", startPlaceStructure);
+  path.addEventListener("click", startPlaceStructure);
+  container.addEventListener("click", startPlaceStructure);
+
+</script>
+
+{% endblock %}

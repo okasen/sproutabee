@@ -1,0 +1,20 @@
+main{
+  display: contents;
+}
+
+.garden{
+  display: flex;
+  flex-flow: column nowrap;
+}
+
+.row{
+  display: flex;
+  flex-flow: row nowrap;
+}
+
+.cell{
+  background-color: brown;
+  width: 39px;
+  height: 39px;
+  margin: 1px;
+}

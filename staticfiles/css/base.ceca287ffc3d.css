@@ -1,0 +1,80 @@
+@font-face {
+  font-family: riffic;
+  src: url("../css/fonts/riffic-bold-webfont.b5e2383f52b8.woff");
+}
+
+@font-face {
+  font-family: SinaNova;
+  src: url("../css/fonts/SinaNovaReg-webfont.62db55a02d3a.woff");
+}
+
+body {
+	background-color: #F2EBEA;
+}
+
+
+a{
+  color: #890040;
+  text-decoration: none;
+}
+
+a:hover{
+	text-decoration: underline;
+}
+
+a:visited{
+  color: #722726;
+  text-decoration: none;
+}
+
+h1 a, h1 a:visited{
+	text-decoration: none;
+	color: #294512;
+}
+
+h1 a:hover {
+	color: #6bab37;
+	text-decoration: none;
+}
+
+main {
+	display: flex;
+	position: relative;
+	flex-direction: column;
+	place-items: center;
+	background-color: #D0EBBA;
+	bottom: 0;
+	right: 0;
+	left: 0;
+	height: 80vh;
+	width: 100%;
+	font-family: SinaNova;
+	font-size: 3rem;
+	color: #231408;
+}
+
+.title{
+	height: 10vh;
+	display: flex;
+	flex-flow: row;
+	position: relative;
+	font-size: 1.5rem;
+	font-family: riffic;
+	color: #294512;
+	text-decoration: none;
+	place-content: center;
+}
+
+@media (min-width: 800px){
+	main {
+		display: flex;
+		position: relative;
+		flex-direction: column;
+		text-align: center;
+		background-color: #D0EBBA;
+		width: 60%;
+    margin-left: 20%;
+    margin-right: 20%;
+		font-size: 2rem;
+	}
+}

@@ -1,0 +1,51 @@
+main{
+  display: contents;
+}
+
+.garden{
+  display: flex;
+  flex-flow: column nowrap;
+}
+
+.row{
+  display: flex;
+  flex-flow: row nowrap;
+}
+
+.cell{
+  background-color: #a37d64;
+  min-width: 20px;
+  min-height: 20px;
+  margin: 1px;
+}
+
+.mode-button{
+  width: 40%;
+  background-color: #8af542;
+  color: black;
+  padding: 14px 20px;
+  margin: 2%;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 1rem;
+}
+
+button:hover {
+  background-color: #8af542;
+  border-width: thick;
+  border-color: green;
+}
+
+.disabled{
+  background-color: #98c478;
+}
+
+@media only (min-size: 800px){
+  .cell{
+    background-color: #a37d64;
+    min-width: 30px;
+    min-height: 30px;
+    margin: 1px;
+  }
+}

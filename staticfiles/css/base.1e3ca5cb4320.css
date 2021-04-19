@@ -1,0 +1,60 @@
+@font-face {
+  font-family: riffic;
+  src: url("../css/fonts/riffic-bold-webfont.b5e2383f52b8.woff");
+}
+
+@font-face {
+  font-family: SinaNova;
+  src: url("../css/fonts/SinaNovaReg-webfont.62db55a02d3a.woff");
+}
+
+body {
+	background-color: #F2EBEA;
+	font-family: SinaNova;
+	font-size: 5rem;
+}
+
+h1 {
+	font-family: riffic;
+	font-size: 15rem;
+  color: #294512;
+	text-decoration: none;
+}
+
+a{
+  color: #890040;
+  text-decoration: none;
+}
+
+a:hover{
+	text-decoration: underline;
+}
+
+a:visited{
+  color: #722726;
+  text-decoration: none;
+}
+
+h1 a, h1 a:visited{
+	text-decoration: none;
+	color: #294512;
+}
+
+h1 a:hover {
+	font-size: 50px;
+	color: #6bab37;
+	text-decoration: none;
+}
+
+main {
+	display: flex;
+	flex-direction: column;
+	place-items: center;
+	padding: 20px;
+	background-color: #D0EBBA;
+	left: 0;
+	right: 0;
+	bottom: 0;
+	top: 15rem;
+	color: #231408;
+}

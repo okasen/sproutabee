@@ -1,0 +1,18 @@
+<!-- templates/registration/login.html -->
+
+{% extends 'base.html' %}
+
+{% load static %}
+
+{% block title %}Create New Garden{% endblock %}
+{% block content %}
+<div class="rect">
+<h2>Your Garden Details</h2>
+  <p>{% firstof errormessage "" %}</p>
+	<form method="post">
+	  {% csrf_token %}
+	  {{ form.as_p }}
+	  <button type="submit">Create Garden</button>
+	</form>
+</div>
+{% endblock %}
